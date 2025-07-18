@@ -1,4 +1,5 @@
-@incollection{nederpelt1994,
+@incollection{nederpelt:1994,
+author = {R.P. Nederpelt},
 title = {Type Systems – Basic Ideas and Applications},
 editor = {R.P. Nederpelt and J.H. Geuvers and R.C. {de Vrijer}},
 series = {Studies in Logic and the Foundations of Mathematics},
@@ -10,39 +11,41 @@ booktitle = {Selected Papers on Automath},
 issn = {0049-237X},
 doi = {https://doi.org/10.1016/S0049-237X(08)70206-4},
 url = {https://www.sciencedirect.com/science/article/pii/S0049237X08702064},
-author = {R.P. Nederpelt}
 }
 
-@misc{lee2007,
-title={Note on cut-elimination},
-author={Chung Tong Lee},
-year={2007},
-month={September},
-day={3},
-howpublished={\url{https://cgi.cse.unsw.edu.au/~cs9103/LN4.pdf}},
-}
-
-
-@book{halbach2011,
-title = {Axiomatic Theories of Truth},
-publisher = {Cambridge University Press},
-year = {2011},
-author = {Volker Halbach}
-}
-
-@book{negri2001,
+@book{negri:2001,
 title = {Structural Proof Theory},
 publisher = {Cambrdige University Press},
 year = {2001},
 author = {Sara Negri and Jan von Plato}
 }
 
-@misc{ffl,
-  author = {SnO2WMaN and Palalansoukî},
-  title = {Formalized\text{F}ormal\text{L}ogic/\text{F}oundation (version 4.15.0-rc1)},
-  year = {},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/FormalizedFormalLogic/Foundation/tree/d5a5b566c4bbc8d91a509979ae5091e750e67059}},
+@inproceedings{from:2021,
+title = {A Succinct Formalization of the Completeness of First-Order Logic},
+abstract = {I succinctly formalize the soundness and completeness of a small Hilbert system for first-order logic in the proof assistant Isabelle/HOL. The proof combines and details ideas from de Bruijn, Henkin, Herbrand, Hilbert, Hintikka, Lindenbaum, Smullyan and others in a novel way, and I use a declarative style, custom notation and proof automation to obtain a readable formalization. The formalized definitions of Hintikka sets and Herbrand structures allow open and closed formulas to be treated uniformly, making free variables a non-concern. This paper collects important techniques in mathematical logic in a way suited for both study and further work.},
+author = {Asta Halkj{\ae}r From},
+year = {2022},
+doi = {10.4230/LIPIcs.TYPES.2021.8},
+series = {Leibniz International Proceedings in Informatics, LIPIcs},
+publisher = {Schlo{\ss} Dagstuhl},
+pages = {8:1--8:24},
+editor = {Henning Basold and Jesper Cockx and Silvia Ghilezan},
+booktitle = {Proceedings of 27th International Conference on Types for Proofs and Programs},
+note = {\url{https://types21.liacs.nl/}}
 }
+
+@article{bruijn:1972,
+title = {Lambda calculus notation with nameless dummies, a tool for automatic formula manipulation, with application to the Church-Rosser theorem},
+journal = {Indagationes Mathematicae (Proceedings)},
+volume = {75},
+number = {5},
+pages = {381-392},
+year = {1972},
+issn = {1385-7258},
+doi = {https://doi.org/10.1016/1385-7258(72)90034-0},
+url = {https://www.sciencedirect.com/science/article/pii/1385725872900340},
+author = {N.G {de Bruijn}},
+abstract = {In ordinary lambda calculus the occurrences of a bound variable are made recognizable by the use of one and the same (otherwise irrelevant) name at all occurrences. This convention is known to cause considerable trouble in cases of substitution. In the present paper a different notational system is developed, where occurrences of variables are indicated by integers giving the “distance” to the binding λ instead of a name attached to that λ. The system is claimed to be efficient for automatic formula manipulation as well as for metalingual discussion. As an example the most essential part of a proof of the Church-Rosser theorem is presented in this namefree calculus.}
+}
+
 

@@ -1,0 +1,180 @@
+\chapter{Disquotation}\label{chapter:disquotation}
+\begin{definition}[T-Replacement]\label{def:T-Replacement}
+\lean{Conservativity.subs_fml_for_t_in_fml}\leanok
+\uses{def:FO-BoundedFormula,def:L,def:L_T,def:BF-Substitution}
+    Let $n$ be some natural number. We then define the T-replacement function, for replacing all T-predicate by a some $\mathcal{L}$ formula, with respect to $n$, $TrReplace_n : \mathcal{B}(\mathcal{L},\mathbb{N},n) \to \mathcal{B}(\mathcal{L}_T,\mathbb{N},n) \to \mathcal{B}(\mathcal{L},\mathbb{N},n)$ recursively as
+    \begin{enumerate}
+    \item $TrReplace_n(\varphi,\bot) = \bot$
+    \item $TrReplace_n(\varphi,(t_1 = t_2)) = (t_1 = t_2)$
+    \item $TrReplace_n(\varphi,Tr(t)) = \varphi(t)$
+    \item $TrReplace_n(\varphi,(\psi_1 \supset \psi_2)) = (TrReplace_n(\varphi,\psi_1) \supset TrReplace_n(\varphi,\psi_2))$
+    \item $TrReplace_n(\varphi,\forall(\psi)) = \forall(TrReplace_{n + 1}(\varphi,\psi))$
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}[$/_{ts}(\varphi)$: T-Replacement over Set]\label{def:T-Replacement-Set}
+\lean{Conservativity.subs_r_for_fml_in_set}\leanok
+\uses{def:T-Replacement,def:FO-Theory,def:L_T}
+We define T-Replacement for all formulas in some set $S \subseteq \mathcal{F}(\mathcal{L_T},\mathbb{N})$ as T-Replacement in all formulas $\varphi \in S$.
+\end{definition}
+
+\begin{definition}[$L$: List]\label{def:List}
+    \lean{List}\leanok
+    We define the set of lists with respect to some set $S$, denoted $L_S$, as the smallest set $X$ such that
+    \begin{enumerate}
+    \item $[] \in X$ and
+    \item if $h \in S$ and $T \in X$, then $[h,T] \in X$.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}[\texttt{++}: List Append]\label{def:List-Append}
+    \lean{List.union}\leanok
+    \uses{def:List}
+    We define the append function for lists $\texttt{++}: L \to L \to L$ recursively by 
+    \begin{enumerate}
+    \item $[] ~\texttt{++}~ l = l$ and
+    \item $[h,T] ~\texttt{++}~ l = [h,T ~\texttt{++}~ L]$.
+    \end{enumerate} 
+\end{definition}
+
+\begin{definition}[$\underline{\texttt{in}}$: Membership relation for Lists]\label{def:List-Mem}
+    \lean{List.Mem}\leanok
+    \uses{def:List}
+    We define the membership relation for lists $\underline{\texttt{in}}$ recursively as the smallest set $X$ such that
+    \begin{enumerate}
+    \item $(a,[a,[]]) \in X$ and
+    \item $(a,[h,T]) \in X$ if $a = h$ or $(a,T) \in X$.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}[\texttt{dedup}: Removed Duplicates From List]\label{def:List-Dedup}
+    \lean{List.dedup}\leanok
+    \uses{def:List-Mem,def:List-Append,def:List}
+    We define the function removing elements from a list $\texttt{dedup} : L \to L$ recursively by
+    \begin{enumerate}
+    \item $\texttt{dedup}([]) = []$ and
+    \item $\texttt{dedup}([h,T]) = \begin{cases}
+    [h,\texttt{dedup}(T)] & \text{if } \neg h ~\underline{\texttt{in}}~ T \\
+    \texttt{dedup}(T) & \text{if } h ~\underline{\texttt{in}}~ T
+    \end{cases}$
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}[$pre\varphi L(d)$: The List of Disquoted Sentences wrt a Derivation with Duplicates]\label{def:Pre-Rel-Phis}
+    \lean{Conservativity.build_relevant_phis_list}\leanok
+    \uses{def:List,def:List-Append,def:Derivation,def:List-Dedup}
+    We define the function $pre\varphi L(d) : \mathcal{D}(\texttt{TB},\Gamma,\Delta) \to L(\mathcal{F}(\mathcal{L},\{0\}))$ recursively by
+    \begin{enumerate}
+    \item $pre\varphi L(\Gamma \Rightarrow \Delta, A) = \begin{cases}
+        [\psi] & \text{if } A = Tr(\ulcorner \psi \urcorner) \leftrightarrow \psi \wedge \psi \in \mathcal{S}(\mathcal{L}) \\
+        \text{[]} & \text{else}
+    \end{cases}$;
+    \item $pre\varphi L(\frac{d}{\Gamma, \Delta}) = pre\varphi L(d)$ and
+    \item $pre\varphi L(\frac{d_1 \quad d_2}{\Gamma \Rightarrow \Delta}) = pre\varphi L(d_1) ~\texttt{++}~ pre\varphi L(d_2)
+$.
+    \end{enumerate}
+\end{definition} 
+
+\begin{definition}[$\varphi L(d)$: The List of Disquoted Sentences wrt a Derivation without Duplicates]\label{def:Rel-Phis}
+    \lean{Conservativity.build_relevant_phis}\leanok
+    \uses{def:Pre-Rel-Phis}
+     We define $\varphi L(d) : \mathcal{D}(\texttt{TB},\Gamma,\Delta) \to L(\mathcal{F}(\mathcal{L},\{0\}))$ by $\varphi L(d) = \texttt{dedup}(pre\varphi L(d))$.
+\end{definition}
+
+\begin{definition}[\texttt{TB}$(d)$: \texttt{TB} with Disquotation Axioms Restricted to Specific Derivation]\label{def:Restricted-TB}
+\lean{Conservativity.restricted_tarski_biconditionals}\leanok
+\uses{def:PAT,def:Derivation,def:L_T,def:Rel-Phis}
+We define restricted \texttt{TB} with respect to a specific derivation $d \in \mathcal{D}(\texttt{TB},\Gamma,\Delta)$, where $\Gamma, \Delta \subseteq \mathcal{F}(\mathcal{L}_{T},\mathbb{N})$, denoted \texttt{TB}$(d)$, as $\texttt{PAT} \cup \{φ | ∃ψ \in \mathcal{S}(\mathcal{L}) : φ = T(⌜ψ⌝) \leftrightarrow ψ \wedge \psi \in \varphi L(d)\}$.
+\end{definition} 
+
+\begin{definition}[$\tau$: Builds Halbach's Tau from a List of Sentences]\label{def:Tau}
+    \lean{Conservativity.build_tau}\leanok
+    \uses{def:List,def:FO-Sentence,def:FO-Formula}
+    We define $\tau : L_{\mathcal{S}(\mathcal{L})} \to \mathcal{F}(\mathcal{L},\mathbb{N})$ by
+    \begin{enumerate}
+    \item $\tau([]) = \bot$ and
+    \item $\tau([\varphi,T]) = ((\#0 = \ulcorner \varphi \urcorner) \wedge \varphi) \vee (\tau(T))$	
+    \end{enumerate}
+\end{definition}
+
+\begin{lemma}[$Injective(ToNat)$: The Translation from Formulas to Natural Numbers is Injective]\label{lem:Injective-ToNat}
+\lean{Conservativity.tonat_inj}\leanok
+\uses{def:FV-Formula-to-N}
+For all formulas $\varphi, \psi \in \mathcal{F}(\mathcal{L},\mathbb{N})$ we have that if $\varphi \neq \psi$, then $\texttt{formulaToNat}(\varphi) \neq \texttt{formulaToNat}(\psi)$.
+\end{lemma}
+
+\begin{definition}[$Injective(Num) Derivable$: Derivation from PA that L-Num is Injective]\label{def:Injective-L-Num-Der}
+\lean{Conservativity.derivable_num_not_eq}
+\uses{def:PA,def:L-Numeral,def:Derivation}
+[Not yet formalized].
+\end{definition}
+
+\begin{definition}[$Injective(\ulcorner \urcorner)$: Derivation from PA that TermEncoding is Injective]\label{def:Term-Encoding-Injective-Der}
+\uses{lem:Injective-ToNat,def:Injective-L-Num-Der}
+[Used implicitly in code of PA-Proves-All-Tau-Disq.]
+\end{definition}
+
+\begin{definition}[$\texttt{paPlusDerGeneral}$: Mapping from TB Derivations to T-Subst TB Derivations]\label{def:PA-Plus-Der-General}
+\lean{Conservativity.pa_plus_der_general}
+\uses{def:Derivation,def:TB,def:T-Replacement-Set,def:Tau,def:Rel-Phis,def:Restricted-TB}
+For all derivations $d_1 \in \mathcal{D}(\texttt{TB},\Gamma,\Delta)$, where $\Gamma, \Delta \subseteq \mathcal{F}(\mathcal{L},\mathbb{N})$, we define the derivation $\texttt{paPlusDerGeneral}(d_1) \in \mathcal{D}(\texttt{TB}(d)/_{ts}(\tau(\varphi L(d))),\Gamma/_{ts}(\tau(\varphi L(d))),\Delta/_{ts}(\tau(\varphi L(d))))$ recursively as [not yet formalized].
+\end{definition}
+
+\begin{lemma}[$\tau$-equivalences: T-Replacement in \texttt{TB}(d) Gives \texttt{PA} Plus $\tau$-Equivalences]\label{lem:Tau-Equivalences}
+\lean{Conservativity.tb_replacement}\leanok
+\uses{def:Derivation,def:TB,def:PA,def:Tau,def:T-Replacement-Set}
+For all $d_1 \in \mathcal{D}(\texttt{TB},\emptyset,\{\varphi\})$, where $\varphi \in \mathcal{F}(\mathcal{L},\mathbb{N})$, we have that $\texttt{TB}(d)/_{ts}(\tau(\varphi L(d))) = \texttt{PA} \cup \{ \tau(\varphi L(d))(\ulcorner \psi \urcorner) \leftrightarrow \psi : \psi \in \varphi L(d) \}$.
+\end{lemma}
+
+\begin{definition}[\texttt{paPlusDer}: Mapping from TB Derivations to PA Derivations]\label{def:PA-Plus-Der}
+\lean{Conservativity.pa_plus_der}\leanok
+\uses{def:PA-Plus-Der-General,lem:Tau-Equivalences,def:Derivation}
+We define the function \texttt{paPlusDer}$: \mathcal{D}(\texttt{TB},\emptyset,\{\varphi\}) \to \mathcal{D}(\texttt{PA} \cup \{ \tau(\varphi L(d))(\ulcorner \psi \urcorner) \leftrightarrow \psi : \psi \in \varphi L(d) \}, \emptyset, \{\varphi \})$, for some $\varphi \in \mathcal{F}(\mathcal{L},\mathbb{N})$ by \texttt{paPlusDer}$(d) = \texttt{paPlusDerGeneral}(d)$. That the resulting derivation is in the co-domain can be obtained from Definition \ref{def:PA-Plus-Der-General}, Lemma \ref{lem:Tau-Equivalences} and the fact that $\emptyset/_{ts}(\varphi) = \emptyset$ for any $\varphi \in \mathcal{F}(\mathcal{L},\mathbb{N})$ and $\{\psi\}/_{ts}(\varphi) = \{\psi\}$ for any $\psi, \varphi \in \mathcal{F}(\mathcal{L},\mathbb{N})$.
+\end{definition}
+
+\begin{definition}[$\texttt{paProvesAllTauDisq}$]\label{def:PA-Proves-All-Tau-Disq}
+    \lean{Conservativity.pa_proves_all_tau_disq}\leanok
+    \uses{def:MetaRules,def:Derivation,def:Tau,def:List,def:Term-Encoding-Injective-Der}
+    Let $[h,T] \in L_{\mathcal{S}(\mathcal{L})}$ and $\varphi ~\underline{\texttt{in}}~ [h,T]$. Then the partial function $\texttt{paProvesAllTauDisq}: L_{\mathcal{S}(\mathcal{L})} \times \mathcal{S}(\mathcal{L}) \rightharpoonup \mathcal{D}(\texttt{PA},\Gamma,\Delta \cup \{\tau([h,T])(\ulcorner \psi \urcorner) \leftrightarrow \psi \})$ is (with a slight abuse of notation) defined by
+    
+    $\texttt{paProvesAllTauDisq}([h,T],\varphi) = \begin{cases}
+    \href{https://github.com/ppls-nd-prs/formalizing-axiomatic-theories-of-truth/blob/main/blueprint/src/img/h-is-psi.pdf}{\text{h-is-psi.pdf}} & \text{if } h = \psi \\
+    \href{https://github.com/ppls-nd-prs/formalizing-axiomatic-theories-of-truth/blob/main/blueprint/src/img/h-is-not-psi.pdf}{\text{h-is-not-psi.pdf}} & \text{otherwise }
+    \end{cases}$.
+    
+    The derivations themselves are linked as they are rather large.
+\end{definition}
+
+\begin{definition}[$\texttt{paPlusToPa}$: Function Derivations from \texttt{PA} + $\tau$-equivalences to \texttt{PA}]\label{def:PA-Plus-To-PA}
+    \lean{Conservativity.pa_plus_to_pa}\leanok
+    \uses{def:Derivation,def:TB,def:PA,def:FO-Formula,def:PA-Proves-All-Tau-Disq}
+    Let $\varphi \in \mathcal{F}(\mathcal{L},\mathbb{N})$, and $d \in \mathcal{D}(\texttt{TB},\emptyset,\{\varphi\})$. Then we define the function \texttt{paPlusToPa}$: \mathcal{D}(\texttt{PA} \cup \{\tau(\varphi L(d))(\ulcorner \psi \urcorner) \leftrightarrow \psi : \psi \in \varphi L(d)\},\Gamma,\Delta) \to \mathcal{D}(\texttt{PA},\Gamma,\Delta)$ by
+    \begin{enumerate}
+    \item $\texttt{paPlusToPa}(\Gamma \Rightarrow \Delta, A) = \begin{cases}
+        \Gamma \Rightarrow \Delta, A & \text{if } A \in \texttt{PA} \\
+        \texttt{paProvesAllTauDisq}(\varphi L(d),A) & \text{else}
+    \end{cases}$;
+    \item $\texttt{paPlusToPa}(\frac{d}{\Gamma, \Delta}) = \frac{\texttt{paPlusToPa}(d)}{\Gamma, \Delta}$ and
+    \item $\texttt{paPlusToPa}(\frac{d_1 \quad d_2}{\Gamma, \Delta}) = \frac{\texttt{paPlusToPa}(d_1) \quad \texttt{paPlusToPa}(d_2)}{\Gamma, \Delta}$.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}[Translation]\label{def:Translation}
+    \lean{Conservativity.translation}\leanok
+    \uses{def:FO-Formula,def:Derivation,def:TB,def:PA,def:PA-Plus-To-PA,def:PA-Plus-Der}
+    Let $\varphi$ be a formula $\varphi \in \mathcal{B}(\mathcal{L},\mathbb{N})$. Then we define the translation function with respect to that formula $\texttt{translation}_{\varphi} : \mathcal{D}(\texttt{TB},\emptyset,\{\varphi\}) \to \mathcal{D}(\texttt{PA},\emptyset,\{\varphi\})$ as $\texttt{translation}_{\varphi}(d) = \texttt{paPlusToPa}(\texttt{paPlusDer}(d))$.
+\end{definition}
+
+\begin{theorem}[Conservativity of \texttt{TB} over \texttt{PA}]\label{def:ConservativityTB}
+    \lean{Conservativity.conservativity_of_tb}\leanok
+    \uses{def:FO-Language,def:FO-Formula,def:L,def:L_T,def:L,def:Formula-Provable}
+    $\forall \varphi \in \mathcal{F}(\mathcal{L},\mathbb{N}) : \texttt{TB} \vdash \varphi \Rightarrow \texttt{PA} \vdash \varphi$
+\end{theorem}
+
+\begin{proof}
+    \uses{def:Formula-Provable,def:Translation}\leanok
+    Let $\psi$ be an arbitrary formula such that $\psi \in \mathcal{F}(\mathcal{L},\mathbb{N})$ and assume $\psi$ is provable from \texttt{TB}. Then, by Definition \ref{def:Formula-Provable}, there exists some derivation $d \in \mathcal{D}(\texttt{TB},\emptyset,\{\psi\})$. Then, by Definition \ref{def:Translation}, we have $\texttt{translation}(d) \in \mathcal{D}(\texttt{PA},\emptyset,\{\psi\})$. Then, by Definition \ref{def:Formula-Provable}, we have that $\psi$ is provable from \texttt{PA}. Then, as we assumed that $\psi$ is provable from \texttt{TB}, we have that if $\texttt{TB} \vdash \psi$, then $\texttt{PA} \vdash \psi$. And since $\psi$ was arbitrary we have that for all $\varphi \in \mathcal{F}(\mathcal{L}, \mathbb{N})$ if $\texttt{TB} \vdash \varphi$, then $\texttt{PA} \vdash \varphi$.
+\end{proof}
+
+
+

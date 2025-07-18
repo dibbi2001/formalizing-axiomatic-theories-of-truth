@@ -1,4 +1,5 @@
 import FormalizingAxiomaticTheoriesOfTruth.Syntax
+import Mathlib.ModelTheory.Complexity
 
 open FirstOrder
 open Language
@@ -6,6 +7,7 @@ open Languages
 
 namespace Calculus
   open BoundedFormula
+  open Substitution
   variable {L : Language}{n : ℕ}{α : Type}
   /- Some notation -/
   notation f " ↑' " n " at "  m => liftAt n m f
@@ -41,16 +43,14 @@ namespace Calculus
     coe := m_add_eq_add_m
 
   def sent_term_to_formula_term : Term L (Empty ⊕ Fin n) → Term L (ℕ ⊕ Fin n)
-      | .var n => match n with
-        | .inl _ => .var (.inl Nat.zero)
-        | .inr k => .var (.inr k)
+      | .var (.inl _) => .var (.inl Nat.zero)
+      | .var (.inr k) => .var (.inr k)
       | .func f ts => .func f (fun i => sent_term_to_formula_term (ts i))
-  instance : Coe (Term L (Empty ⊕ Fin n)) (Term L (ℕ ⊕ Fin n)) where
-    coe := sent_term_to_formula_term
+
   def bf_empty_to_bf_N : ∀{n}, BoundedFormula L Empty n → BoundedFormula L ℕ n
       | _, .falsum => .falsum
-      | _, .equal t₁ t₂ => .equal t₁ t₂
-      | _, .rel R ts => .rel R (fun i => ts i)
+      | _, .equal t₁ t₂ => .equal (sent_term_to_formula_term t₁) (sent_term_to_formula_term t₂)
+      | _, .rel R ts => .rel R (fun i => (sent_term_to_formula_term (ts i)))
       | _, .imp f₁ f₂ => .imp (bf_empty_to_bf_N f₁) (bf_empty_to_bf_N f₂)
       | _, .all f => .all (bf_empty_to_bf_N f)
   instance : Coe (Sentence L) (Formula L ℕ) where
@@ -89,7 +89,9 @@ namespace Calculus
           | isFalse hq => isFalse (by simp[hp, hq])
         | isFalse hp => isFalse (by simp[hp])
 
+  instance : DecidableEq (L.BoundedFormula ℕ n) := hasDecEq
   instance : DecidableEq (L.Formula ℕ) := hasDecEq
+  instance : DecidableEq (L.Sentence) := hasDecEq
 
   def shift_finset_up (Δ : Finset (L.Formula ℕ)) : Finset (L.Formula ℕ) :=
     Finset.image (relabel shift_free_up) Δ
@@ -101,7 +103,7 @@ namespace Calculus
 
   /-- G3c sequent calculus -/
   inductive Derivation : L.Theory → (Finset (Formula L ℕ)) → (Finset (Formula L ℕ)) → Type _ where
-    | tax {Th Γ Δ} (h : ∃f : L.Sentence, f ∈ Th ∧ (bf_empty_to_bf_N f) ∈ Δ) : Derivation Th Γ Δ
+    | tax {Th Γ Δ S} (A) (h₁ : A ∈ Th) (h₂ : Δ = S ∪ {bf_empty_to_bf_N A}) : Derivation Th Γ Δ
     | lax {Th Γ Δ} (h : ∃f, f ∈ Γ ∧ f ∈ Δ) : Derivation Th Γ Δ
     | left_conjunction (A B S₁ S₂) {Th Γ Δ} (d₁ : Derivation Th S₁ Δ) (h₁ : S₁ = S₂ ∪ {A, B}) (h₂ : Γ = S₂ ∪ {A ∧' B}): Derivation Th Γ Δ
     | left_disjunction (A B S₁ S₂ S₃) {Th Γ Δ} (d₁ : Derivation Th S₁ Δ) (h₁ : S₁ = S₃ ∪ {A}) (d₂ : Derivation Th S₂ Δ) (h₂ : S₂ = S₃ ∪ {B}) (h₅ : Γ = S₃ ∪ {A ∨' B}) : Derivation Th Γ Δ
@@ -130,13 +132,34 @@ namespace Calculus
   section MetaRules
     axiom left_weakening : ∀Th : L.Theory, ∀Γ Δ : Finset (L.Formula ℕ), ∀φ : L.Formula ℕ, (Th ⊢ Γ ⟶ Δ) → (Th ⊢ {φ} ∪ Γ ⟶ Δ)
 
-    variable {Th : L.Theory}{Γ Δ : Finset (L.Formula ℕ)}
+    variable {Th : L.Theory}{Γ Δ : Finset (L.Formula ℕ)}{A B : L.Formula ℕ}
+    def left_weakening_intro : Derivation Th Γ Δ → Derivation Th (Γ ∪ {A}) Δ := sorry
+    def right_weakening_intro : Derivation Th Γ Δ → Derivation Th Γ (Δ ∪ {A}) := sorry
     def iax (t : L.Term (ℕ ⊕ Fin 0)) (h : t =' t ∈ Δ) : Derivation Th Γ Δ := sorry
     def i_two_for_one (S A) (t₁ t₂ : L.Term (ℕ ⊕ Fin 0)) (h₁ : A/[t₁] ∈ S) (h₂ : t₁ =' t₂ ∈ Γ) (d₁ : Derivation Th Γ S) (h₂ : A/[t₂] ∈ Δ) : Derivation Th Γ Δ := sorry --might not need this
     def i_one_for_two (S A) (t₁ t₂ : L.Term (ℕ ⊕ Fin 0)) (h₁ : A/[t₂] ∈ S) (h₂ : t₁ =' t₂ ∈ Γ) (d₁ : Derivation Th Γ S) (h₂ : A/[t₂] ∈ Δ) : Derivation Th Γ Δ := sorry --might not need this
     def left_negation (A S₁ S₂) (d₁ : Derivation Th S₁ S₂) (h₁ : Γ = S₁ ∪ {∼A}) : Derivation Th Γ Δ := sorry
     def right_negation (A S₁ S₂) (d₁ : Derivation Th S₁ S₂) (h₂ : Δ = S₂ ∪ {∼A}) : Derivation Th Γ Δ := sorry
+    def right_negation_intro : Derivation Th (Γ ∪ {A}) Δ → Derivation Th Γ (Δ ∪ {∼A}) := sorry 
+    def left_negation_intro : Derivation Th Γ (Δ ∪ {A}) → Derivation Th (Γ ∪ {∼A}) Δ := sorry
     def cut (A S₁ S₂ S₃ S₄) (d₁ : Derivation Th S₁ (S₂ ∪ {A})) (d₂ : Derivation Th ({A} ∪ S₃) S₄) (h₁ : Γ = S₁ ∪ S₃) (h₂ : Δ = S₂ ∪ S₄) : Derivation Th Γ Δ := sorry
+    def iff_intro : Derivation Th Δ (Γ ∪ {A ⟹ B}) → Derivation Th Δ (Γ ∪ {B ⟹ A}) → Derivation Th Δ (Γ ∪ {A ⇔ B}) := sorry
+    def or_comm : Derivation Th Δ (Γ ∪ {A ∨' B}) → Derivation Th Δ (Γ ∪ {B ∨' A}) := sorry
+    def right_implication_elim : Derivation Th Δ (Γ ∪ {A ⟹ B}) → Derivation Th (Δ ∪ {A}) (Γ ∪ {B}) := sorry
+    def right_implication_intro : Derivation Th (Δ ∪ {A}) (Γ ∪ {B}) → Derivation Th Δ (Γ ∪ {A ⟹ B}) := sorry
+    def right_disjunction_intro : Derivation Th Δ (Γ ∪ {A, B}) → Derivation Th Δ (Γ ∪ {A ∨' B}) := fun d => Derivation.right_disjunction A B (Γ ∪ {A, B}) Γ d rfl rfl 
+    def left_disjunction_intro : Derivation Th (Δ ∪ {A}) Γ → Derivation Th (Δ ∪ {B}) Γ → Derivation Th (Δ ∪ {A ∨' B}) Γ := by
+      intro d₁ d₂
+      apply Derivation.left_disjunction A B (Δ ∪ {A}) (Δ ∪ {B}) Δ d₁ rfl d₂ rfl rfl 
+    def left_bot_intro : Derivation Th (Δ ∪ {⊥}) Γ := by
+      apply Derivation.left_bot (by simp)
+    def left_conjunction_intro : Derivation Th (Δ ∪ {A, B}) Γ → Derivation Th (Δ ∪ {A ∧' B}) Γ := fun d₁ => Derivation.left_conjunction A B (Δ ∪ {A, B}) Δ d₁ rfl rfl 
+    def right_conjunction_intro : Derivation Th Γ (Δ ∪ {A}) → Derivation Th Γ (Δ ∪ {B}) → Derivation Th Γ (Δ ∪ {A ∧' B}) := sorry
+    def left_double_negation_elimination : Derivation Th (Δ ∪ {∼ ∼ A}) Γ → Derivation Th (Δ ∪ {A}) Γ := sorry
+    def iff_to_left_to_right : Derivation Th Γ (Δ ∪ {A ⇔ B}) → Derivation Th Γ (Δ ∪ {A ⟹ B}) := sorry
+    def iff_to_right_to_left : Derivation TH Γ (Δ ∪ {A ⇔ B}) → Derivation Th Γ (Δ ∪ {B ⟹ A}) := sorry
+
+    
 
   end MetaRules
 end Calculus

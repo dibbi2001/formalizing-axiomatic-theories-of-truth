@@ -1,6 +1,6 @@
 \chapter{Preliminaries}
 \section{Language}\label{subsec:language}
-The ordinary definition of a first-order language $\mathcal{L}$ proceeds from the specification of a signature $\mathcal{S}$ and then an inductive definition of the way formulas can be build with elements from $\mathcal{S}$, the set of logical connectives, variables and the quantifiers. See that for any first order language all these elements except the signature are the same. Therefore, we could think of a specific first order language as being fully specified by its signature.
+The ordinary definition of a first-order language $\mathcal{L}$ proceeds from the specification of a signature $\mathcal{S}$ and then an inductive definition of the way formulas can be build with elements from $\mathcal{S}$, the set of logical connectives, variables and the quantifiers. See that for any first order language all these elements except the signature are the same. Hence, we could think of a specific first order language as being fully specified by its signature.
 
 \begin{definition}[First-order Language]\label{def:FO-Language}
 \lean{FirstOrder.Language}\leanok
@@ -40,13 +40,13 @@ We shall from here on out refer to $(a,l)$ from a disjoint union of sets by $\#a
         \item if $f \in \mathcal{B}(\mathcal{L},\alpha,n+1)$, then $\forall f \in \mathcal{B}(\mathcal{L},\alpha,n)$.
     \end{enumerate}
 \end{definition}
-Notice that these definitions differ from classical De Bruijn \cite{bruijn:1972} notation in the way variable binding is organized. Firstly, the disjoint union operator in Definition \ref{def:FO-BoundedFormula}'s clauses 2 and 3 guarantees that free variables and variables bound by a quantifier can only be constructed from different sets, whereas in classical De Bruijn all variables are indexed by $\mathbb{N}$. The reason for such an implementation is that now we can distinguish free variables from bound variables. This makes it straightforward to keep track in the recursive cases of what the first free variable is. This is useful for substitution, which will be made clearer shortly. Furthermore, free variables can now come from any set, rather than $\mathbb{N}$, as they are not bound and hence do not have to indicate at what level they are bound. These two notational nuances require a slight rewrite of our example formula \ref{fml:db} to $\forall (\forall(P(\&0) \rightarrow R(f(\&1))) \to (R(\#x_0) \to P(a)))$, where $x_0$ is some element from the relevant type $\alpha$ for indexing free variables.
+Notice that these definitions differ from classial De Bruijn \cite{bruijn:1972} notation in the way variable binding is organised. Firstly, the disjoint union operator in Definition \ref{def:FO-BoundedFormula}'s clauses 2 and 3 guarantees that free variables and variables bound by a quantifier can only be constructed from different sets, whereas in classical De Bruijn all variables are indexed by $\mathbb{N}$. The reason for such an implementation is that now we can distinguish free variables from bound variables. This makes it straightforward to keep track in the recursive cases of what the first free variable is. This is useful for substitution, which will be made clearer shortly. Furthermore, free variables can now come from any set, rather than $\mathbb{N}$, as they are not bound and hence do not have to indicate at what level they are bound. These two notational nuances require a slight rewrite of our example formula \ref{fml:db} to $\forall (\forall(P(\&0) \rightarrow R(f(\&1))) \to (R(\#x_0) \to P(a)))$, where $x_0$ is some element from the relevant type $\alpha$ for indexing free variables.
 
 These concepts are sufficient to then also define the notion of term substitution in terms and formulas. 
 \begin{definition}[$/(t)$: Substitution in Terms]\label{def:Term-Substitution}
 \lean{BoundedFormula.Substitution.term_substitution}\leanok
 \uses{def:FO-Term}
-For some language $\mathcal{L}$, we define the substitution function of terms in terms $/(t) : \mathcal{T}(\mathcal{L},(\mathbb{N} \sqcup \{1,...,n\}) \to \mathcal{T}(\mathcal{L},(\mathbb{N} \sqcup \{1,...,n\}) \to \mathcal{T}(\mathcal{L},(\mathbb{N} \sqcup \{1,...,n\})$ recursively by
+For some language $\mathcal{L}$, we define the subsitution function of terms in terms $/(t) : \mathcal{T}(\mathcal{L},(\mathbb{N} \sqcup \{1,...,n\}) \to \mathcal{T}(\mathcal{L},(\mathbb{N} \sqcup \{1,...,n\}) \to \mathcal{T}(\mathcal{L},(\mathbb{N} \sqcup \{1,...,n\})$ recursively by
 \begin{enumerate}
 \item $t/(a) = \begin{cases}
     t & \text{if } a = \#0 \\
@@ -59,7 +59,7 @@ For some language $\mathcal{L}$, we define the substitution function of terms in
 \begin{definition}[$/(t)$: Substitution in BoundedFormulas]\label{def:BF-Substitution}
 \lean{BoundedFormula.Substitution.formula_substitution}\leanok
 \uses{def:FO-BoundedFormula,def:Term-Substitution}
-For some language $\mathcal{L}$ and a natural number $n$, we define the substitution function of terms in BoundedFormulas $/(t) : \mathcal{B}(\mathcal{L},\mathbb{N},n) \to \mathcal{T}(\mathcal{L},(\mathbb{N} \sqcup \{1,...,n\}) \to \mathcal{B}(\mathcal{L},\mathbb{N},n)$ recursively by
+For some language $\mathcal{L}$ and a natural number $n$, we define the subsitution function of terms in BoundedFormulas $/(t) : \mathcal{B}(\mathcal{L},\mathbb{N},n) \to \mathcal{T}(\mathcal{L},(\mathbb{N} \sqcup \{1,...,n\}) \to \mathcal{B}(\mathcal{L},\mathbb{N},n)$ recursively by
 \begin{enumerate}
 \item $\bot/(t) = \bot$;
 \item $(t_1 = t_2)/(t) = (t_1/(t) = t_2/(t))$;
@@ -125,7 +125,7 @@ A \texttt{Sentence} is then defined as a \texttt{Formula} that has no free varia
 \end{definition}
 
 \section{Coding}\label{subsec:coding}
-All well-formed formulas of some first-order language are encodable as a natural number, a conventional example of this being Gödel encoding, but as \texttt{mathlib} does not yet feature Gödel encoding we use other native functions that have the same properties. Both \texttt{mathlib}'s namespace \texttt{Term} and \texttt{BoundedFormula} have a functions \texttt{listEncode} that encode \texttt{Term}s and \texttt{BoundedFormula}s as \texttt{List}s respectively. These lists can then be encoded as natural numbers using \texttt{mathlib}'s \texttt{Encodable.encodeList}. To encode some language $\mathcal{L}$ into a natural number these functions require encodings for $\mathcal{L}$'s function and relation symbols. Furthermore, they also require a set for indexing variables that is proved to be encodable and since \texttt{mathlib} natively has a proof of the encodability of natural numbers, we use from here on out $\mathbb{N}$ to index our free variables. Thus we obtain our definitions of \texttt{termToNat} and \texttt{formulaToNat}.
+All well-formed formulas of some first-order language are encodable as a natural number, a conventional example of this being Gödel encoding, but as \texttt{mathlib} does not yet feature Gödel encoding we use other native functions that have the same properties. Both \texttt{mathlib}'s namespace \texttt{Term} and \texttt{BoundedFormula} have a functions \texttt{listEncode} that encode \texttt{Term}s and \texttt{BoundedFormula}s as \texttt{List}s respectively. These lists can then be encoded as natural numbers using \texttt{mathlib}'s \texttt{Encodable.encodeList}. To encode some language $\mathcal{L}$ into a natural number these functions require encodings for $\mathcal{L}$'s function and relation symbols. Furthermore, they also require a set for indexing variables that is proved to be encodable and since \texttt{mathlib} natively has a proof of the encodability of natural numbers, we use from here on out $\mathbb{N}$ to index our free variables. Hence we obtain our definitions of \texttt{termToNat} and \texttt{formulaToNat}.
 
 \begin{definition}[Encoding terms from formulas with free variables]\label{def:FV-Term-Enc}
   \lean{Languages.TermEncoding.term_tonat}\leanok
