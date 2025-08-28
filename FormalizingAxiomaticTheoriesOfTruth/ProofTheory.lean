@@ -140,26 +140,26 @@ namespace Calculus
     def i_one_for_two (S A) (t₁ t₂ : L.Term (ℕ ⊕ Fin 0)) (h₁ : A/[t₂] ∈ S) (h₂ : t₁ =' t₂ ∈ Γ) (d₁ : Derivation Th Γ S) (h₂ : A/[t₂] ∈ Δ) : Derivation Th Γ Δ := sorry --might not need this
     def left_negation (A S₁ S₂) (d₁ : Derivation Th S₁ S₂) (h₁ : Γ = S₁ ∪ {∼A}) : Derivation Th Γ Δ := sorry
     def right_negation (A S₁ S₂) (d₁ : Derivation Th S₁ S₂) (h₂ : Δ = S₂ ∪ {∼A}) : Derivation Th Γ Δ := sorry
-    def right_negation_intro : Derivation Th (Γ ∪ {A}) Δ → Derivation Th Γ (Δ ∪ {∼A}) := sorry 
+    def right_negation_intro : Derivation Th (Γ ∪ {A}) Δ → Derivation Th Γ (Δ ∪ {∼A}) := sorry
     def left_negation_intro : Derivation Th Γ (Δ ∪ {A}) → Derivation Th (Γ ∪ {∼A}) Δ := sorry
     def cut (A S₁ S₂ S₃ S₄) (d₁ : Derivation Th S₁ (S₂ ∪ {A})) (d₂ : Derivation Th ({A} ∪ S₃) S₄) (h₁ : Γ = S₁ ∪ S₃) (h₂ : Δ = S₂ ∪ S₄) : Derivation Th Γ Δ := sorry
     def iff_intro : Derivation Th Δ (Γ ∪ {A ⟹ B}) → Derivation Th Δ (Γ ∪ {B ⟹ A}) → Derivation Th Δ (Γ ∪ {A ⇔ B}) := sorry
     def or_comm : Derivation Th Δ (Γ ∪ {A ∨' B}) → Derivation Th Δ (Γ ∪ {B ∨' A}) := sorry
     def right_implication_elim : Derivation Th Δ (Γ ∪ {A ⟹ B}) → Derivation Th (Δ ∪ {A}) (Γ ∪ {B}) := sorry
     def right_implication_intro : Derivation Th (Δ ∪ {A}) (Γ ∪ {B}) → Derivation Th Δ (Γ ∪ {A ⟹ B}) := sorry
-    def right_disjunction_intro : Derivation Th Δ (Γ ∪ {A, B}) → Derivation Th Δ (Γ ∪ {A ∨' B}) := fun d => Derivation.right_disjunction A B (Γ ∪ {A, B}) Γ d rfl rfl 
+    def right_disjunction_intro : Derivation Th Δ (Γ ∪ {A, B}) → Derivation Th Δ (Γ ∪ {A ∨' B}) := fun d => Derivation.right_disjunction A B (Γ ∪ {A, B}) Γ d rfl rfl
     def left_disjunction_intro : Derivation Th (Δ ∪ {A}) Γ → Derivation Th (Δ ∪ {B}) Γ → Derivation Th (Δ ∪ {A ∨' B}) Γ := by
       intro d₁ d₂
-      apply Derivation.left_disjunction A B (Δ ∪ {A}) (Δ ∪ {B}) Δ d₁ rfl d₂ rfl rfl 
+      apply Derivation.left_disjunction A B (Δ ∪ {A}) (Δ ∪ {B}) Δ d₁ rfl d₂ rfl rfl
     def left_bot_intro : Derivation Th (Δ ∪ {⊥}) Γ := by
       apply Derivation.left_bot (by simp)
-    def left_conjunction_intro : Derivation Th (Δ ∪ {A, B}) Γ → Derivation Th (Δ ∪ {A ∧' B}) Γ := fun d₁ => Derivation.left_conjunction A B (Δ ∪ {A, B}) Δ d₁ rfl rfl 
+    def left_conjunction_intro : Derivation Th (Δ ∪ {A, B}) Γ → Derivation Th (Δ ∪ {A ∧' B}) Γ := fun d₁ => Derivation.left_conjunction A B (Δ ∪ {A, B}) Δ d₁ rfl rfl
     def right_conjunction_intro : Derivation Th Γ (Δ ∪ {A}) → Derivation Th Γ (Δ ∪ {B}) → Derivation Th Γ (Δ ∪ {A ∧' B}) := sorry
     def left_double_negation_elimination : Derivation Th (Δ ∪ {∼ ∼ A}) Γ → Derivation Th (Δ ∪ {A}) Γ := sorry
     def iff_to_left_to_right : Derivation Th Γ (Δ ∪ {A ⇔ B}) → Derivation Th Γ (Δ ∪ {A ⟹ B}) := sorry
     def iff_to_right_to_left : Derivation TH Γ (Δ ∪ {A ⇔ B}) → Derivation Th Γ (Δ ∪ {B ⟹ A}) := sorry
 
-    
+
 
   end MetaRules
 end Calculus
@@ -189,17 +189,15 @@ def mp_derivation
   apply Finset.insert_eq
   apply Finset.insert_eq
 
-def disj_intro_left_derivation
-  (Th : L.Theory) (A B : Formula L ℕ) :
-  Derivation Th {A} {A ∨' B} := by
-  apply Derivation.right_disjunction A B {A, B} {} _ (by simp) (by simp)
-  exact Derivation.lax ⟨A, by simp⟩
-
-def disj_intro_right_derivation
-  (Th : L.Theory) (A B : Formula L ℕ) :
-  Derivation Th {B} {A ∨' B} := by
-  apply Derivation.right_disjunction A B {A, B} {} _ (by simp) (by simp)
-  exact Derivation.lax ⟨B, by simp⟩
+def conj_intro_derivation
+  (Th :L.Theory) (A B : Formula L ℕ) :
+  Derivation Th {A, B} {A ∧' B} := by
+  apply Derivation.right_conjunction A B {A} {B} ∅
+  apply Derivation.lax ⟨A, by simp⟩
+  simp
+  apply Derivation.lax ⟨B, by simp⟩
+  simp
+  simp
 
 def conj_elim_left_derivation
   (Th : L.Theory) (A B : Formula L ℕ) :
@@ -216,6 +214,29 @@ def conj_elim_right_derivation
   apply Derivation.left_conjunction A B {A, B} {}
   apply Derivation.lax
   simp
+  simp
+  simp
+
+def disj_intro_left_derivation
+  (Th : L.Theory) (A B : Formula L ℕ) :
+  Derivation Th {A} {A ∨' B} := by
+  apply Derivation.right_disjunction A B {A, B} {} _ (by simp) (by simp)
+  exact Derivation.lax ⟨A, by simp⟩
+
+def disj_intro_right_derivation
+  (Th : L.Theory) (A B : Formula L ℕ) :
+  Derivation Th {B} {A ∨' B} := by
+  apply Derivation.right_disjunction A B {A, B} {} _ (by simp) (by simp)
+  exact Derivation.lax ⟨B, by simp⟩
+
+def disj_elim_derivation
+  (Th : L.Theory) (A B C: Formula L ℕ)
+  (d₁ : Derivation Th {A} {C}) (d₂ : Derivation Th {B} {C}) :
+  Derivation Th {A ∨' B} {C} := by
+  apply Derivation.left_disjunction A B {A} {B} ∅
+  exact d₁
+  simp
+  exact d₂
   simp
   simp
 
@@ -238,6 +259,17 @@ def double_neg_right_derivation
   apply Derivation.lax
   simp
   rw [Finset.insert_eq]
+  rw [Finset.empty_union]
+
+def right_implication_derivation
+  (Th : L.Theory) (A B Γ : Formula L ℕ)
+  (d₁: Derivation Th {Γ, A} {B}) :
+  Derivation Th {Γ} {A ⟹ B} := by
+  apply Derivation.right_implication A B {Γ, A} {B} ∅
+  exact d₁
+  rw [Finset.insert_eq]
+  rw [Finset.union_comm]
+  rw [Finset.empty_union]
   rw [Finset.empty_union]
 
 def demorganslaw_first_derivation
@@ -290,27 +322,16 @@ def demorganslaw_second_derivation
   rw [Finset.union_comm]
   rw [Finset.empty_union]
 
-def right_implication_derivation
-  (Th : L.Theory) (A B Γ : Formula L ℕ)
-  (d₁: Derivation Th {Γ, A} {B}) :
-  Derivation Th {Γ} {A ⟹ B} := by
-  apply Derivation.right_implication A B {Γ, A} {B} ∅
-  exact d₁
-  rw [Finset.insert_eq]
-  rw [Finset.union_comm]
-  rw [Finset.empty_union]
-  rw [Finset.empty_union]
-
-def disj_elim_derivation
-  (Th : L.Theory) (A B C: Formula L ℕ)
-  (d₁ : Derivation Th {A} {C}) (d₂ : Derivation Th {B} {C}) :
-  Derivation Th {A ∨' B} {C} := by
-  apply Derivation.left_disjunction A B {A} {B} ∅
-  exact d₁
-  simp
-  exact d₂
-  simp
-  simp
+  def excl_mid_derivation
+    (Th : L.Theory) (A : Formula L ℕ) (Δ : Finset (Formula L ℕ)) :
+    Derivation Th Δ {A ∨'∼A} := by
+    apply Derivation.right_disjunction A ∼A {A, ∼A} {}
+    apply Calculus.right_negation A (Δ ∪ {A}) {A}
+    apply Derivation.lax
+    simp
+    rw [Finset.insert_eq]
+    simp
+    rfl
 
 lemma mp : ∀th : L.Theory, ∀(A B : L.Formula ℕ), Nonempty (Derivation th {A, A ⟹ B} {B}) := by
   let mp_derivation
@@ -365,6 +386,163 @@ lemma conj_elim : ∀th : L.Theory, ∀(A B : L.Formula ℕ), Nonempty (Derivati
   apply A at B
   apply Nonempty.intro B
 
+lemma disj_intro_left : ∀th : L.Theory, ∀(A B : L.Formula ℕ), Nonempty (Derivation th {A} {A ∨' B}) := by
+  let disj_intro_left_derivation
+    (Th : L.Theory) (A B : Formula L ℕ) :
+    Derivation Th {A} {A ∨' B} := by
+    apply Derivation.right_disjunction A B {A, B} {} _ (by simp) (by simp)
+    exact Derivation.lax ⟨A, by simp⟩
+  intro th A B
+  apply disj_intro_left_derivation at th
+  apply th at A
+  apply A at B
+  apply Nonempty.intro B
+
+lemma disj_intro_right : ∀th : L.Theory, ∀(A B : L.Formula ℕ), Nonempty (Derivation th {B} {A ∨' B}) := by
+  let disj_intro_right_derivation
+    (Th : L.Theory) (A B : Formula L ℕ) :
+    Derivation Th {B} {A ∨' B} := by
+    apply Derivation.right_disjunction A B {A, B} {} _ (by simp) (by simp)
+    exact Derivation.lax ⟨B, by simp⟩
+  intro th A B
+  apply disj_intro_right_derivation at th
+  apply th at A
+  apply A at B
+  apply Nonempty.intro B
+
+lemma disj_elim : ∀th : L.Theory, ∀(A B C : L.Formula ℕ), Nonempty ((Derivation th {A} {C}) →
+    (Derivation th {B} {C}) →
+    (Derivation th {A ∨' B} {C})) := by
+  let disj_elim_derivation
+    (Th : L.Theory) (A B C: Formula L ℕ)
+    (d₁ : Derivation Th {A} {C}) (d₂ : Derivation Th {B} {C}) :
+    Derivation Th {A ∨' B} {C} := by
+    apply Derivation.left_disjunction A B {A} {B} ∅
+    exact d₁
+    simp
+    exact d₂
+    simp
+    simp
+  intro th A B C
+  apply disj_elim_derivation at th
+  apply th at A
+  apply A at B
+  apply B at C
+  apply Nonempty.intro at C
+  exact C
+
+lemma double_neg_left : ∀th : L.Theory, ∀(A : L.Formula ℕ), Nonempty (Derivation th {∼∼A} {A}) := by
+  let double_neg_left_derivation
+    (Th: L.Theory) (A : Formula L ℕ) :
+    Derivation Th {∼∼A} {A} := by
+    apply Calculus.left_negation ∼A ∅ {A, ∼A}
+    apply Calculus.right_negation A {A} {A}
+    apply Derivation.lax
+    simp
+    rw [Finset.insert_eq]
+    rw [Finset.empty_union]
+  intro th A
+  apply double_neg_left_derivation at th
+  apply th at A
+  apply Nonempty.intro A
+
+lemma double_neg_right : ∀th : L.Theory, ∀(A : L.Formula ℕ), Nonempty (Derivation th {A} {∼∼A}) := by
+  let double_neg_right_derivation
+    (Th: L.Theory) (A : Formula L ℕ) :
+    Derivation Th {A} {∼∼A} := by
+    apply Calculus.right_negation ∼A {A,∼A} ∅
+    apply Calculus.left_negation A {A} {A}
+    apply Derivation.lax
+    simp
+    rw [Finset.insert_eq]
+    rw [Finset.empty_union]
+  intro th A
+  apply double_neg_right_derivation at th
+  apply th at A
+  apply Nonempty.intro A
+
+lemma right_implication : ∀th : L.Theory, ∀(A B Γ : L.Formula ℕ), Nonempty ((Derivation th ({Γ, A}) {B}) → (Derivation th {Γ} {A ⟹ B})) := by
+  let right_implication_derivation
+    (Th : L.Theory) (A B Γ : Formula L ℕ)
+    (d₁: Derivation Th {Γ, A} {B}) :
+    Derivation Th {Γ} {A ⟹ B} := by
+    apply Derivation.right_implication A B {Γ, A} {B} ∅
+    exact d₁
+    rw [Finset.insert_eq]
+    rw [Finset.union_comm]
+    rw [Finset.empty_union]
+    rw [Finset.empty_union]
+  intro th A B Γ
+  apply right_implication_derivation at th
+  apply th at A
+  apply A at B
+  apply B at Γ
+  apply Nonempty.intro at Γ
+  exact Γ
+
+lemma demorganslaw_first : ∀th : L.Theory, ∀(A B : L.Formula ℕ), Nonempty (Derivation th {∼(A ∧' B)} {∼A ∨' ∼B}) := by
+  let demorganslaw_first_derivation
+    (Th : L.Theory) (A B : Formula L ℕ) :
+    Derivation Th {∼(A ∧' B)} {∼A ∨' ∼B} := by
+    apply Calculus.left_negation (A ∧'B) {} {A ∧'B, ∼A∨'∼B}
+    apply Derivation.right_disjunction ∼A ∼B {A ∧'B, ∼A, ∼B} {A ∧' B}
+    apply Calculus.right_negation A {A} {A ∧'B, ∼B}
+    apply Calculus.right_negation B {A, B} {A ∧'B}
+    apply Derivation.right_conjunction A B {A} {B} ∅
+    apply Derivation.lax
+    simp
+    rw [Finset.empty_union]
+    apply Derivation.lax
+    simp
+    rw [Finset.empty_union]
+    rw [Finset.empty_union]
+    rw [Finset.insert_eq]
+    rw [Finset.insert_eq, Finset.insert_eq, Finset.insert_eq]
+    rw [Finset.union_assoc]
+    rw [Finset.union_comm {∼A} {∼B}]
+    rw [Finset.insert_eq]
+    rw [Finset.insert_eq]
+    simp
+  intro th A B
+  apply demorganslaw_first_derivation at th
+  apply th at A
+  apply A at B
+  apply Nonempty.intro B
+
+lemma demorganslaw_second : ∀th : L.Theory, ∀(A B : L.Formula ℕ), Nonempty (Derivation th {∼(A ∨' B)} {∼A ∧' ∼B}) := by
+  let demorganslaw_second_derivation
+    (Th : L.Theory) (A B : Formula L ℕ) :
+    Derivation Th {∼(A ∨' B)} {∼A ∧' ∼B} := by
+    apply Calculus.left_negation (A ∨'B) ∅ {A ∨' B, ∼A ∧' ∼B}
+    apply Derivation.right_disjunction A B {∼A ∧' ∼B, A, B} {∼A ∧' ∼B}
+    apply Derivation.right_conjunction ∼A ∼B {A, B, ∼A} {A, B, ∼B} {A, B}
+    apply Calculus.right_negation A {A} {A, B}
+    apply Derivation.lax
+    simp
+    rw [Finset.insert_eq, Finset.insert_eq, Finset.insert_eq]
+    rw [Finset.union_assoc]
+    rw [Finset.insert_eq, Finset.insert_eq, Finset.insert_eq]
+    rw [Finset.union_assoc]
+    apply Calculus.right_negation B {B} {A, B}
+    apply Derivation.lax
+    simp
+    rw [Finset.insert_eq, Finset.insert_eq, Finset.insert_eq]
+    rw [Finset.union_assoc]
+    rw [Finset.insert_eq, Finset.insert_eq, Finset.insert_eq]
+    rw [Finset.union_assoc]
+    rw [Finset.insert_eq, Finset.insert_eq]
+    rw [Finset.union_comm]
+    rw [Finset.insert_eq]
+    rw [Finset.insert_eq]
+    rw [Finset.union_comm]
+    rw [Finset.empty_union]
+  intro th A B
+  apply demorganslaw_second_derivation at th
+  apply th at A
+  apply A at B
+  apply Nonempty.intro B
+
+
 lemma excl_mid : ∀th : L.Theory, ∀(A : L.Formula ℕ), ∀(Δ : Finset (Formula L ℕ)), Nonempty (Derivation th Δ {A ∨'∼A}) := by
   let excl_mid_derivation
     (Th : L.Theory) (A : Formula L ℕ) (Δ : Finset (Formula L ℕ)) :
@@ -376,7 +554,11 @@ lemma excl_mid : ∀th : L.Theory, ∀(A : L.Formula ℕ), ∀(Δ : Finset (Form
     rw [Finset.insert_eq]
     simp
     rfl
-  sorry
+  intro th A Δ
+  apply excl_mid_derivation at th
+  apply th at A
+  apply A at Δ
+  apply Nonempty.intro Δ
 
 lemma eqv_trans : ∀Th : L.Theory, ∀(A B C : L.Formula ℕ), Nonempty (Derivation Th {A ⇔ B, C ⇔ B} {A ⇔ C}) := by
   let eqv_trans_derivation

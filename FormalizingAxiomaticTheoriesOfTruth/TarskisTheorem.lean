@@ -62,7 +62,7 @@ theorem tarskis_theorem : 𝐓𝐁 ⊢ false_formula := by
       let φ : BoundedFormula ℒₜ (Fin 1) 0 := ∼T(#0)
       have step1: ∀ψ : ℒₜ.Sentence, φ/[⌜ψ⌝] = ∼T(⌜ψ⌝) := by
 
-      apply diagonal_lemma φ
+      apply diagonal_lemma φMor
 
       sorry
   obtain ⟨ψ⟩ := liar_formula_exists
